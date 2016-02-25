@@ -18,6 +18,9 @@ parser.add_option("-m", "--msg", dest="message",help="Message to identify if ham
 (options, args) = parser.parse_args()
 
 MESSAGE_ = options.message
-svm_detector_reloaded = cPickle.load(open('sms_spam_detector.pkl'))
+model = open('sms_spam_detector.pkl')
+#svm_detector_reloaded = cPickle.load(open('sms_spam_detector.pkl'))
+svm_detector_reloaded = cPickle.load(model)
+model.close()
 message = MESSAGE_ 
 print 'Prediction:\t', svm_detector_reloaded.predict([message])[0]
