@@ -17,6 +17,7 @@ from sklearn.learning_curve import learning_curve
 
 ########### Funciton #################
 def split_into_tokens(message):
+
     message = unicode(message, 'utf8')  # convert bytes into proper unicode
     return TextBlob(message).words
 def split_into_lemmas(message):
@@ -39,25 +40,25 @@ bow_transformer = CountVectorizer(analyzer=split_into_lemmas).fit(messages['mess
 messages_bow = bow_transformer.transform(messages['message'])
 tfidf_transformer = TfidfTransformer().fit(messages_bow)
 messages_tfidf = tfidf_transformer.transform(messages_bow)
-svm_detector = SVC(C = 100,gamma=0.001)
-svm_detector = svm_detector.fit(messages_tfidf, messages['label'])
+svm_detector_ = SVC(C = 100,gamma=0.001)
+svm_detector_ = svm_detector_.fit(messages_tfidf, messages['label'])
 #spam_detector = MultinomialNB().fit(messages_tfidf, messages['label'])
-all_predictions = svm_detector.predict(messages_tfidf)
+all_predictions = svm_detector_.predict(messages_tfidf)
 
 
 
-msg_train, msg_test, label_train, label_test = train_test_split(messages_tfidf, messages['label'], test_size=0.3)
+msg_train, msg_test, label_train, label_test = train_test_split(messages['message'], messages['label'], test_size=0.3)
 
 print classification_report(messages['label'], all_predictions)
-print confusion_matrix(label_test, svm_detector.predict(msg_test))
-print classification_report(label_test, svm_detector.predict(msg_test))
+#print confusion_matrix(label_test, svm_detector.predict(msg_test))
+#print classification_report(label_test, svm_detector.predict(msg_test))
 #raw_input()
 # store the spam detector to disk after training
-with open('sms_spam_detector.pkl', 'wb') as fout:
-    cPickle.dump(svm_detector, fout)
+#with open('sms_spam_detector.pkl', 'wb') as fout:
+#    cPickle.dump(svm_detector, fout)
 
 
-"""pipeline_svm = Pipeline([
+pipeline_svm = Pipeline([
     ('bow', CountVectorizer(analyzer=split_into_lemmas)),
     ('tfidf', TfidfTransformer()),
     ('classifier', SVC()),  # <== change here
@@ -87,7 +88,7 @@ with open('sms_spam_detector.pkl', 'wb') as fout:
     cPickle.dump(svm_detector, fout)
 
 # ...and load it back, whenever needed, possibly on a different machine
-svm_detector_reloaded = cPickle.load(open('sms_spam_detector.pkl'))
+"""svm_detector_reloaded = cPickle.load(open('sms_spam_detector.pkl'))
 message4 = messages['message'][3]
 print 'before:', svm_detector.predict([message4])[0]
 print 'after:', svm_detector_reloaded.predict([message4])[0]
