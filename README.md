@@ -2,7 +2,7 @@
 __author__ : HELAL ALI Misu 
 __email__  : michou.helal@gmail.com
 
-Descption:
+#Description:
 	Testing multiple algo from sklearn and define the best model to use for spam detection
 
 Usage:
@@ -25,3 +25,4 @@ TO-DO:
 ----- 
 	- Delete pipeline 
 	- Complete DockerFile
+	- API mode for usefull app
