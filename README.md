@@ -25,4 +25,6 @@ TO-DO:
 ----- 
 	- Delete pipeline 
 	- Complete DockerFile
-	- API mode for usefull app
+Requirement:
+-----------
+	- python -m textblob.download_corpora

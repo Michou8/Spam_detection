@@ -18,3 +18,4 @@ RUN pip install statsmodels
 RUN pip install seaborn
 RUN pip install textblob
 RUN pip install cPickle
+RUN python -m textblob.download_corpora
