@@ -1,9 +1,6 @@
-##Spam detection using sklearn libs
-__author__ : HELAL ALI Misu 
-__email__  : michou.helal@gmail.com
-
-#Description:
-	Testing multiple algo from sklearn and define the best model to use for spam detection
+Spam detection:
+==============
+Testing multiple algo from sklearn and define the best model to use for spam detection
 
 Requirement:
 -----------
@@ -37,3 +34,6 @@ TO-DO:
 ----- 
 	- Delete pipeline 
 	- Complete DockerFile
+__author__ : HELAL ALI Misu
+__email__  : michou.helal@gmail.com
+
