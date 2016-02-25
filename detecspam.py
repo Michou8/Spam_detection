@@ -59,7 +59,7 @@ print classification_report(messages['label'], all_predictions)
 
 
 pipeline_svm = Pipeline([
-    ('bow', CountVectorizer(analyzer=split_into_lemmas)),
+    ('bow', CountVectorizer(decode_error='replace',ngram_range=(1,2))),
     ('tfidf', TfidfTransformer()),
     ('classifier', SVC()),  # <== change here
 ])
