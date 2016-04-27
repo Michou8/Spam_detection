@@ -1,9 +1,6 @@
 #MAINTENAIR misu.helal@gmail.com
 FROM ubuntu
 
-#File / Author Maintainer
-MAINTAINER Kwyn Meagher
-
 #Update repositor source list
 RUN sudo apt-get update
 
