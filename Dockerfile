@@ -1,4 +1,3 @@
-From ubuntu:14.04
 #MAINTENAIR misu.helal@gmail.com
 FROM ubuntu
 
