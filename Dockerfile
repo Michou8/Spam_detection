@@ -19,3 +19,8 @@ RUN pip install seaborn
 RUN pip install textblob
 RUN pip install cPickle
 RUN python -m textblob.download_corpora
+
+RUN mkdir SPAM
+COPY * SPAM/
+
+RUN python spam_api/manager.py runserver
