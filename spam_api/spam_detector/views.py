@@ -32,6 +32,6 @@ def detect(request):
 		# Read the content into the request
 		message = request.read()
 		# Predict the category of this message
-		data = {"prediction":svm_detector_reloaded.predict([message])[0]}
+		data = {"prediction":svm_detector_reloaded.predict([message])[0],'proba':str(svm_detector_reloaded.predict_proba([message]))}
 	# return a JSON response
 	return JsonResponse(data)
