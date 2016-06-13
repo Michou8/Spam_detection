@@ -34,7 +34,13 @@ parser.add_option("-f", "--file", dest="filename",help="Train data file  [label 
 (options, args) = parser.parse_args()
 
 FILE_TRAIN = options.filename
-
+################
+# You can connect to sql database
+"""df = psql.read_sql(('select "Timestamp","Value" from "MyTable" '
+                     'where "Timestamp" BETWEEN %(dstart)s AND %(dfinish)s'),
+                   db,params={"dstart":datetime(2014,6,24,16,0),"dfinish":datetime(2014,6,24,17,0)},
+                   index_col=['Timestamp'])
+"""
 messages = pandas.read_csv(FILE_TRAIN, sep='\t', quoting=csv.QUOTE_NONE,names=["label", "message"])
 bow_transformer = CountVectorizer(analyzer=split_into_lemmas).fit(messages['message'])
 messages_bow = bow_transformer.transform(messages['message'])
@@ -93,3 +99,4 @@ message4 = messages['message'][3]
 print 'before:', svm_detector.predict([message4])[0]
 print 'after:', svm_detector_reloaded.predict([message4])[0]
 """
+ 
