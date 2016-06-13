@@ -14,7 +14,7 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.cross_validation import StratifiedKFold, cross_val_score, train_test_split 
 from sklearn.tree import DecisionTreeClassifier 
 from sklearn.learning_curve import learning_curve
-
+import os
 ########### Funciton #################
 def split_into_tokens(message):
 
@@ -42,15 +42,33 @@ FILE_TRAIN = options.filename
                    index_col=['Timestamp'])
 """
 messages = pandas.read_csv(FILE_TRAIN, sep='\t', quoting=csv.QUOTE_NONE,names=["label", "message"])
-bow_transformer = CountVectorizer(analyzer=split_into_lemmas).fit(messages['message'])
-messages_bow = bow_transformer.transform(messages['message'])
-tfidf_transformer = TfidfTransformer().fit(messages_bow)
-messages_tfidf = tfidf_transformer.transform(messages_bow)
-svm_detector_ = SVC(C = 100,gamma=0.001)
-svm_detector_ = svm_detector_.fit(messages_tfidf, messages['label'])
-#spam_detector = MultinomialNB().fit(messages_tfidf, messages['label'])
-all_predictions = svm_detector_.predict(messages_tfidf)
 
+if 'vectorizer.pkl' not in os.listdir('data_vect/')
+	pipeline_vectorizer = Pipeline([
+	    ('bow', CountVectorizer(decode_error='replace',ngram_range=(1,2))),
+	    ('tfidf', TfidfTransformer())
+	])
+	pipeline_vectorizer.fit(messages['message'])
+	with open('data_vect/vectorizer.pkl', 'wb') as fout:
+		cPickle.dump(pipeline_vectorizer, fout)
+else:
+	pipeline_vectorizer = cPickle.load(open('data_vect/vectorizer.pkl'))	
+
+
+#bow_transformer = CountVectorizer(analyzer=split_into_lemmas).fit(messages['message'])
+#messages_bow = bow_transformer.transform(messages['message'])
+#tfidf_transformer = TfidfTransformer().fit(messages_bow)
+#messages_tfidf = tfidf_transformer.transform(messages_bow)
+messages_tfidf = pipeline_vectorizer.transform(messages['message'])
+nb = MultinomialNB()
+
+
+
+#svm_detector_ = SVC(C = 100,gamma=0.001)
+#svm_detector_ = svm_detector_.fit(messages_tfidf, messages['label'])
+#all_predictions = svm_detector_.predict(messages_tfidf)
+nb = nb.fit_partial(messages_tfidf, messages['label'])
+all_predictions = nb.predict(messages_tfidf)
 
 
 msg_train, msg_test, label_train, label_test = train_test_split(messages['message'], messages['label'], test_size=0.3)

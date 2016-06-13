@@ -6,6 +6,7 @@ Requirement:
 -----------
 	- pip install -r requirement.txt
 	- python -m textblob.download_corpora (It will be optional)
+	- apt-get install python-dev
 
 Usage:
 -----
