@@ -43,23 +43,11 @@ FILE_TRAIN = options.filename
 """
 messages = pandas.read_csv(FILE_TRAIN, sep='\t', quoting=csv.QUOTE_NONE,names=["label", "message"])
 
-"""if 'vectorizer.pkl' not in os.listdir('data_vect/'):
-	pipeline_vectorizer = Pipeline([
-	    ('bow', CountVectorizer(decode_error='replace',ngram_range=(1,2))),
-	    ('tfidf', TfidfTransformer())
-	])
-	pipeline_vectorizer.fit(messages['message'])
-	with open('data_vect/vectorizer.pkl', 'wb') as fout:
-		cPickle.dump(pipeline_vectorizer, fout)
-else:
-	pipeline_vectorizer = cPickle.load(open('data_vect/vectorizer.pkl'))	
-"""
 
 bow_transformer = CountVectorizer(analyzer=split_into_lemmas).fit(messages['message'])
 messages_bow = bow_transformer.transform(messages['message'])
 tfidf_transformer = TfidfTransformer().fit(messages_bow)
 messages_tfidf = tfidf_transformer.transform(messages_bow)
-#messages_tfidf = pipeline_vectorizer.transform(messages['message'])
 
 classe = ['ham', 'spam']
 
