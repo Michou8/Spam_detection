@@ -43,7 +43,7 @@ FILE_TRAIN = options.filename
 """
 messages = pandas.read_csv(FILE_TRAIN, sep='\t', quoting=csv.QUOTE_NONE,names=["label", "message"])
 
-if 'vectorizer.pkl' not in os.listdir('data_vect/')
+"""if 'vectorizer.pkl' not in os.listdir('data_vect/'):
 	pipeline_vectorizer = Pipeline([
 	    ('bow', CountVectorizer(decode_error='replace',ngram_range=(1,2))),
 	    ('tfidf', TfidfTransformer())
@@ -53,29 +53,35 @@ if 'vectorizer.pkl' not in os.listdir('data_vect/')
 		cPickle.dump(pipeline_vectorizer, fout)
 else:
 	pipeline_vectorizer = cPickle.load(open('data_vect/vectorizer.pkl'))	
+"""
 
+bow_transformer = CountVectorizer(analyzer=split_into_lemmas).fit(messages['message'])
+messages_bow = bow_transformer.transform(messages['message'])
+tfidf_transformer = TfidfTransformer().fit(messages_bow)
+messages_tfidf = tfidf_transformer.transform(messages_bow)
+#messages_tfidf = pipeline_vectorizer.transform(messages['message'])
 
-#bow_transformer = CountVectorizer(analyzer=split_into_lemmas).fit(messages['message'])
-#messages_bow = bow_transformer.transform(messages['message'])
-#tfidf_transformer = TfidfTransformer().fit(messages_bow)
-#messages_tfidf = tfidf_transformer.transform(messages_bow)
-messages_tfidf = pipeline_vectorizer.transform(messages['message'])
-nb = MultinomialNB()
+classe = ['ham', 'spam']
 
-
-
-#svm_detector_ = SVC(C = 100,gamma=0.001)
-#svm_detector_ = svm_detector_.fit(messages_tfidf, messages['label'])
-#all_predictions = svm_detector_.predict(messages_tfidf)
-nb = nb.fit_partial(messages_tfidf, messages['label'])
-all_predictions = nb.predict(messages_tfidf)
-
-
-msg_train, msg_test, label_train, label_test = train_test_split(messages['message'], messages['label'], test_size=0.3)
-
-print classification_report(messages['label'], all_predictions)
-
-# store the spam detector to disk after training
-with open('nb_model.pkl', 'wb') as fout:
-    cPickle.dump(nb, fout)
+if 'nb_model.pkl' not in os.listdir("./"):
+	print 'First trainning'
+	nb = MultinomialNB()
+	classe = ['ham', 'spam']
+	nb.partial_fit(messages_tfidf, messages['label'],classes=classe)
+	all_predictions = nb.predict(messages_tfidf)
+	msg_train, msg_test, label_train, label_test = train_test_split(messages['message'], messages['label'], test_size=0.3)
+	print classification_report(messages['label'], all_predictions)
+	# store the spam detector to disk after training
+	with open('nb_model.pkl', 'wb') as fout:
+	    cPickle.dump(nb, fout)
+else:
+	print "Training with partial_fit"
+	with open('nb_model.pkl','rb') as f:
+		nb = cPickle.load(f)
+	nb.partial_fit(messages_tfidf, messages['label'],classes=classe)
+        all_predictions = nb.predict(messages_tfidf)
+        print classification_report(messages['label'], all_predictions)
+        # store the spam detector to disk after training
+        with open('nb_model.pkl', 'wb') as fout:
+            cPickle.dump(nb, fout)
 
