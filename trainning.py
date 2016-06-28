@@ -17,6 +17,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.learning_curve import learning_curve
 import os
 import testLog
+import sqlite3
+import datetime
 ########### Function #################
 def split_into_tokens(message):
 
@@ -32,13 +34,26 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("-f", "--file", dest="filename",help="Train data file  [label \t message]",default='./data/SMSSpamCollection')
 #parser.add_option("-q", "--quiet",action="store_false", dest="verbose", default=True,help="don't print status messages to stdout")
-parser.add_option("-t", "--train", dest="trainning",help="Train file path",default='nb_model.pkl')
+parser.add_option("-t", "--train", dest="trainning",help="Train file path",default='spam_api/spam_detector/spam_model/sms_spam_detector.pkl')
 (options, args) = parser.parse_args()
 
 FILE_TRAIN = options.filename
 FILE_TRAIN_LOCATION = options.trainning
-FILE_VECTOR_MODEL = 'vector.pkl'
-FILE_VECTOR = 'cvector.json'
+FILE_VECTOR_MODEL = 'spam_api/vector.pkl'
+FILE_VECTOR = 'spam_api/cvector.json'
+FILE_DATABASE = 'spam_api/db.sqlite3'
+
+conn = sqlite3.connect(FILE_DATABASE)
+c_sql = conn.cursor()
+# Create table
+# It's not necessary the better solution
+try:
+	c_sql.execute('''CREATE TABLE T_SPAM_LEARNING
+	             (date text, content text,proba real)''')
+except:
+	print 'T_SPAM_LEARNING exist'
+raw_input("resr")
+
 ################
 # You can connect to sql database
 """df = psql.read_sql(('select "Timestamp","Value" from "MyTable" '
@@ -57,7 +72,16 @@ def cCounterWords(messages,label,model={}):
 	testLog.log().info('"size_data" :'+str(SIZE_NEW_DATA))
 	print SIZE_NEW_DATA
 	for message in messages:
+		# Do this instead
+		#t = ('RHAT',)
+		#c.execute('SELECT * FROM stocks WHERE symbol=?', t)
 		message = split_into_lemmas(message)
+		try:
+                        t = (str(datetime.datetime.now()),str(message),label[c],)
+                        c_sql.execute("INSERT INTO T_SPAM_LEARNING VALUES (?,?,?)",t)
+                except:
+                        print 'unicode present'
+		
 		tmp = {}
 		for word in message:
 			if word not in tmp:
@@ -81,11 +105,16 @@ def cCounterWords(messages,label,model={}):
 	with open(FILE_VECTOR,'wb') as f:
 		json.dump(model,f)
 	return model,SIZE_NEW_DATA
+
+
 if FILE_VECTOR in  os.listdir('./'):
 	print FILE_VECTOR
 	with open(FILE_VECTOR,'rb') as f:
 		model = json.load(f)
 
+
+
+	
 model,SIZE_NEW_DATA = cCounterWords(messages['message'],messages['label'],model=model)
 print SIZE_NEW_DATA
 
