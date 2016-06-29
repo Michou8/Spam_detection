@@ -46,21 +46,13 @@ FILE_DATABASE = 'spam_api/db.sqlite3'
 conn = sqlite3.connect(FILE_DATABASE)
 c_sql = conn.cursor()
 # Create table
-# It's not necessary the better solution
+# It's not necessary the better solution try catch
 try:
 	c_sql.execute('''CREATE TABLE T_SPAM_LEARNING
-	             (date text, content text,proba real)''')
+	             (date text, content text,proba_spam real,supervised_utils real,processed_model real)''')
 except:
 	print 'T_SPAM_LEARNING exist'
-raw_input("resr")
 
-################
-# You can connect to sql database
-"""df = psql.read_sql(('select "Timestamp","Value" from "MyTable" '
-                     'where "Timestamp" BETWEEN %(dstart)s AND %(dfinish)s'),
-                   db,params={"dstart":datetime(2014,6,24,16,0),"dfinish":datetime(2014,6,24,17,0)},
-                   index_col=['Timestamp'])
-"""
 messages = pandas.read_csv(FILE_TRAIN, sep='\t', quoting=csv.QUOTE_NONE,names=["label", "message"])
 model = {}
 def cCounterWords(messages,label,model={}):
@@ -75,10 +67,14 @@ def cCounterWords(messages,label,model={}):
 		# Do this instead
 		#t = ('RHAT',)
 		#c.execute('SELECT * FROM stocks WHERE symbol=?', t)
+		if label[c] == 'spam':
+			p = 1
+		else:
+			p = 0
 		message = split_into_lemmas(message)
 		try:
-                        t = (str(datetime.datetime.now()),str(message),label[c],)
-                        c_sql.execute("INSERT INTO T_SPAM_LEARNING VALUES (?,?,?)",t)
+                        t = (str(datetime.datetime.now()),str(message),p,1,1,)
+                        c_sql.execute("INSERT INTO T_SPAM_LEARNING VALUES (?,?,?,?,?)",t)
                 except:
                         print 'unicode present'
 		

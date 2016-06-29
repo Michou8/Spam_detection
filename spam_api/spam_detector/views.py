@@ -11,6 +11,12 @@ import csv
 from textblob import TextBlob
 import cPickle
 import numpy as np
+import sqlite3
+import datetime
+FILE_DATABASE = 'db.sqlite3'
+conn = sqlite3.connect(FILE_DATABASE)
+c_sql = conn.cursor()
+
 # TO-DO : log event file
 # import the logging library
 #import logging
@@ -74,7 +80,9 @@ def detect(request):
 	if request.method == "POST":
 		# Read the content into the request
 		message = request.read()
-		data = tf_idf.transform(CounterWords([message.lower()]))
+		d_to_sql = CounterWords([message.lower()])
+		data = tf_idf.transform(d_to_sql)
+
 		message = data
 		classes = svm_detector_reloaded.classes_
 		prediction_label = ''
@@ -95,5 +103,14 @@ def detect(request):
 		# Predict the category of this message
 		data = {"prediction":prediction_label,'proba_spam':p_d['spam']}
 		print data
+		
+		for content in d_to_sql:
+			t = (str(datetime.datetime.now()),str(content),p_d['spam'],0,0,)
+			d = c_sql.execute("SELECT * FROM T_SPAM_LEARNING WHERE content=?",(str(content),))
+	                for i in d:
+				if not i:
+					c_sql.execute("INSERT INTO T_SPAM_LEARNING VALUES (?,?,?,?,?)",t)
+					print 'INSERTION'
+					
 	# return a JSON response
 	return JsonResponse(data)
